@@ -116,7 +116,11 @@ def run_stream() -> None:
 
             try:
                 post_event(player, event, line)
-                logger.info("Forwarded event player=%s event=%s", player, event)
+                logger.info(
+                    "Forwarded event player=%s event=%s",
+                    player,
+                    event,
+                )
             except (urllib.error.URLError, RuntimeError) as exc:
                 logger.exception("Failed to forward event: %s", exc)
     finally:
@@ -128,7 +132,9 @@ if __name__ == "__main__":
         try:
             run_stream()
         except FileNotFoundError:
-            logger.error("'docker' command is not available. Install Docker CLI.")
+            logger.error(
+                "'docker' command is not available. Install Docker CLI."
+            )
             sys.exit(1)
         except Exception as exc:  # noqa: BLE001
             logger.exception("Forwarder crashed: %s", exc)
