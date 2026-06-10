@@ -28,13 +28,13 @@ if not SHARED_SECRET:
     raise RuntimeError("FORWARDER_SHARED_SECRET is required")
 
 JOIN_PATTERNS = [
-    re.compile(r": (?P<player>[A-Za-z0-9_]{1,16}) joined the game\\b"),
-    re.compile(r": (?P<player>[A-Za-z0-9_]{1,16})\\[/[^\\]]+\\] logged in\\b"),
+    re.compile(r": (?P<player>[A-Za-z0-9_]{1,16}) joined the game\b"),
+    re.compile(r": (?P<player>[A-Za-z0-9_]{1,16})\[/[^\]]+\] logged in\b"),
 ]
 
 LEAVE_PATTERNS = [
-    re.compile(r": (?P<player>[A-Za-z0-9_]{1,16}) left the game\\b"),
-    re.compile(r": (?P<player>[A-Za-z0-9_]{1,16}) lost connection\\b"),
+    re.compile(r": (?P<player>[A-Za-z0-9_]{1,16}) left the game\b"),
+    re.compile(r": (?P<player>[A-Za-z0-9_]{1,16}) lost connection\b"),
 ]
 
 last_sent: dict[tuple[str, str], float] = {}

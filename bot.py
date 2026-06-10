@@ -72,7 +72,7 @@ async def healthcheck() -> dict[str, str]:
 @app.post("/minecraft/events")
 async def receive_event(
     event: MinecraftEvent,
-    x_bridge_secret: str = Header(default="", convert_underscores=False),
+    x_bridge_secret: str = Header(default="", alias="X-Bridge-Secret"),
 ) -> dict[str, str]:
     if x_bridge_secret != WEBHOOK_SHARED_SECRET:
         raise HTTPException(status_code=401, detail="Unauthorized")
