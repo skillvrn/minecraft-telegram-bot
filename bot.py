@@ -58,10 +58,10 @@ async def send_telegram_message(text: str) -> dict[str, Any]:
 def format_event_message(event: MinecraftEvent) -> str:
     escaped_player = event.player.replace("<", "&lt;").replace(">", "&gt;")
     if event.event == "join":
-        return f"<b>{escaped_player}</b> joined the Minecraft server"
+        return f"<b>{escaped_player}</b> зашёл на сервер Minecraft"
     if event.event == "leave":
-        return f"<b>{escaped_player}</b> left the Minecraft server"
-    return f"<b>{escaped_player}</b> event: {event.event}"
+        return f"<b>{escaped_player}</b> вышел с сервера Minecraft"
+    return f"<b>{escaped_player}</b> событие: {event.event}"
 
 
 @app.get("/healthz")

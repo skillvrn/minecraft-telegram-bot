@@ -1,5 +1,6 @@
 services:
   minecraft-telegram-bot:
+    container_name: minecraft-telegram-bot
     image: ${DOCKER_REPO}/minecraft-telegram-bot:${VERSION}
     pull_policy: if_not_present
     restart: always
