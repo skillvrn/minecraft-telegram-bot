@@ -1,0 +1,15 @@
+[Unit]
+Description=Minecraft log forwarder to external Telegram bridge
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=root
+EnvironmentFile=/etc/minecraft-log-forwarder/forwarder.env
+ExecStart=/usr/bin/python3 /opt/minecraft-log-forwarder/forwarder.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
