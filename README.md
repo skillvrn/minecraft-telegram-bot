@@ -87,13 +87,13 @@ Directory: `minecraft-forwarder/` contains a lightweight forwarder service.
 ### 1. Copy files to Minecraft host
 
 ```bash
-scp -P 22875 -r minecraft-forwarder sk@80.87.195.197:/home/sk/
+scp -r minecraft-forwarder user@1.2.3.4:/home/user/
 ```
 
 ### 2. Install service
 
 ```bash
-ssh -p 22875 sk@80.87.195.197
+ssh user@1.2.3.4
 cd ~/minecraft-forwarder
 sudo bash install_on_minecraft_server.sh
 ```
