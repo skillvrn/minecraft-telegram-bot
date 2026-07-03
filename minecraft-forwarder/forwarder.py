@@ -38,6 +38,10 @@ LEAVE_PATTERNS = [
 ]
 
 last_sent: dict[tuple[str, str], float] = {}
+RCON_LIST_PATTERN = re.compile(
+    r"There are (?P<count>\d+) of a max of \d+ players online"
+    r"(?:\s*:\s*(?P<players>.*))?"
+)
 
 
 def parse_event(line: str) -> tuple[str, str] | None:
@@ -64,12 +68,40 @@ def should_skip_duplicate(player: str, event: str) -> bool:
     return False
 
 
-def post_event(player: str, event: str, source_line: str) -> None:
+def get_online_player_snapshot() -> tuple[int, list[str]]:
+    output = subprocess.check_output(
+        ["docker", "exec", CONTAINER_NAME, "rcon-cli", "list"],
+        text=True,
+        stderr=subprocess.STDOUT,
+    ).strip()
+    match = RCON_LIST_PATTERN.search(output)
+    if not match:
+        raise RuntimeError(f"Unexpected rcon-cli output: {output}")
+
+    count = int(match.group("count"))
+    players_raw = (match.group("players") or "").strip()
+    players = [
+        player.strip()
+        for player in players_raw.split(",")
+        if player.strip()
+    ]
+    return count, players
+
+
+def post_event(
+    player: str,
+    event: str,
+    source_line: str,
+    online_player_count: int,
+    online_player_names: list[str],
+) -> None:
     payload = {
         "player": player,
         "event": event,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "source_line": source_line.strip(),
+        "online_player_count": online_player_count,
+        "online_player_names": online_player_names,
     }
     data = json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(
@@ -115,7 +147,16 @@ def run_stream() -> None:
                 continue
 
             try:
-                post_event(player, event, line)
+                online_player_count, online_player_names = (
+                    get_online_player_snapshot()
+                )
+                post_event(
+                    player,
+                    event,
+                    line,
+                    online_player_count,
+                    online_player_names,
+                )
                 logger.info(
                     "Forwarded event player=%s event=%s",
                     player,
