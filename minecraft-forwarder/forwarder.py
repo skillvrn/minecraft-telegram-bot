@@ -80,7 +80,11 @@ def get_online_player_snapshot() -> tuple[int, list[str]]:
 
     count = int(match.group("count"))
     players_raw = (match.group("players") or "").strip()
-    players = [player.strip() for player in players_raw.split(",") if player.strip()]
+    players = [
+        player.strip()
+        for player in players_raw.split(",")
+        if player.strip()
+    ]
     return count, players
 
 
@@ -143,7 +147,9 @@ def run_stream() -> None:
                 continue
 
             try:
-                online_player_count, online_player_names = get_online_player_snapshot()
+                online_player_count, online_player_names = (
+                    get_online_player_snapshot()
+                )
                 post_event(
                     player,
                     event,
