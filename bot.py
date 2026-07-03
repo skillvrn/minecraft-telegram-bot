@@ -33,6 +33,8 @@ if not WEBHOOK_SHARED_SECRET:
 class MinecraftEvent(BaseModel):
     player: str = Field(min_length=1, max_length=32)
     event: str
+    online_player_count: int = Field(ge=0)
+    online_player_names: list[str] = Field(default_factory=list)
     timestamp: str | None = None
     source_line: str | None = None
 
@@ -57,11 +59,48 @@ async def send_telegram_message(text: str) -> dict[str, Any]:
 
 def format_event_message(event: MinecraftEvent) -> str:
     escaped_player = event.player.replace("<", "&lt;").replace(">", "&gt;")
+    player_names = format_player_names(event.online_player_names)
+    player_count_word = pluralize_players(event.online_player_count)
     if event.event == "join":
-        return f"<b>{escaped_player}</b> зашёл на сервер Minecraft"
+        return (
+            f"🟢 <b>{escaped_player}</b> зашёл на сервер Minecraft. "
+            f"В игре <b>{event.online_player_count}</b> {player_count_word}"
+            f"{player_names}."
+        )
     if event.event == "leave":
-        return f"<b>{escaped_player}</b> вышел с сервера Minecraft"
-    return f"<b>{escaped_player}</b> событие: {event.event}"
+        return (
+            f"🔴 <b>{escaped_player}</b> вышел с сервера Minecraft. "
+            f"В игре <b>{event.online_player_count}</b> {player_count_word}"
+            f"{player_names}."
+        )
+    return (
+        f"ℹ️ <b>{escaped_player}</b> событие: {event.event}. "
+        f"В игре <b>{event.online_player_count}</b> {player_count_word}"
+        f"{player_names}."
+    )
+
+
+def format_player_names(players: list[str]) -> str:
+    if not players:
+        return ""
+    escaped_players = [
+        player.replace("<", "&lt;").replace(">", "&gt;")
+        for player in players
+    ]
+    return f": {', '.join(escaped_players)}"
+
+
+def pluralize_players(count: int) -> str:
+    last_two = count % 100
+    if 11 <= last_two <= 14:
+        return "игроков"
+
+    last_digit = count % 10
+    if last_digit == 1:
+        return "игрок"
+    if 2 <= last_digit <= 4:
+        return "игрока"
+    return "игроков"
 
 
 @app.get("/healthz")

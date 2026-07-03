@@ -21,6 +21,8 @@ Bot accepts POST requests to `/minecraft/events` with JSON:
 {
   "player": "Notch",
   "event": "join",
+	"online_player_count": 3,
+	"online_player_names": ["User_1", "User_2", "User_3"],
   "timestamp": "2026-06-10T10:00:00Z",
   "source_line": "[10:00:00 INFO]: Notch joined the game"
 }
@@ -83,6 +85,9 @@ The workflow builds and pushes image, renders `docker-compose.yaml` from templat
 ## Minecraft host setup (RU server)
 
 Directory: `minecraft-forwarder/` contains a lightweight forwarder service.
+It queries Minecraft via RCON on each detected join/leave event so the online
+player count stays correct even if the forwarder is restarted while players are
+already connected.
 
 ### 1. Copy files to Minecraft host
 
